@@ -1,25 +1,83 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useRef, useState } from "react";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const videoRef = useRef(null);
+  const photoRef = useRef(null);
+
+  const [hasPhoto, setHasPhoto] = useState(false);
+
+  const getVideo = async () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: { width: 400, height: 400 } })
+      .then((stream) => {
+        let video = videoRef.current;
+        video.srcObject = stream;
+        video.play();
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const takePhoto = () => {
+    const width = 414;
+    const height = width / (16 / 9);
+
+    let video = videoRef.current;
+    let photo = photoRef.current;
+
+    photo.width = width;
+    photo.height = height;
+
+    const ctx = photo.getContext("2d");
+    ctx.drawImage(video, 0, 0, width, height);
+    setHasPhoto(true);
+  };
+
+  const closePhoto = () => {
+    let photo = photoRef.current;
+    let ctx = photo.getContext("2d");
+
+    ctx.clearRect(0, 0, photo.width, photo.height);
+
+    setHasPhoto(false);
+  };
+
+  useEffect(() => {
+    getVideo();
+  }, [videoRef]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="max-w-lg mx-auto mt-10">
+      <div className="w-[399px] border border-10 border-black h-[399px] bg-black overflow-hidden rounded-xl mx-auto">
+        <video ref={videoRef}></video>
+      </div>
+      <div className="text-center mt-4">
+        <button
+          onClick={takePhoto}
+          className="bg-blue-400 px-3 py-2 font-semibold rounded"
         >
-          Learn React
-        </a>
-      </header>
+          SNAP!
+        </button>
+      </div>
+      <div className="text-center mt-3">
+        <p>Your picture would be displayed below after you snap!</p>
+      </div>
+
+      <div>
+        <div className="w-[399px] border border-10 border-black  bg-black overflow-hidden rounded-xl mx-auto">
+          <canvas ref={photoRef} className="object-cover"></canvas>
+        </div>
+        <div className="text-center mt-4">
+          <button
+            onClick={closePhoto}
+            className="bg-red-400 px-3 py-2 font-semibold rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
