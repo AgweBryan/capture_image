@@ -5,8 +5,6 @@ const App = () => {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
 
-  const [hasPhoto, setHasPhoto] = useState(false);
-
   const getVideo = async () => {
     navigator.mediaDevices
       .getUserMedia({ video: { width: 400, height: 400 } })
@@ -30,7 +28,6 @@ const App = () => {
 
     const ctx = photo.getContext("2d");
     ctx.drawImage(video, 0, 0, width, height);
-    setHasPhoto(true);
   };
 
   const closePhoto = () => {
@@ -38,8 +35,6 @@ const App = () => {
     let ctx = photo.getContext("2d");
 
     ctx.clearRect(0, 0, photo.width, photo.height);
-
-    setHasPhoto(false);
   };
 
   useEffect(() => {
